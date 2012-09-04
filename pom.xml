@@ -13,7 +13,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <fcrepo.version>3.6</fcrepo.version>
+    <fcrepo.version>3.6.1-SNAPSHOT</fcrepo.version>
+    <fedora.port>9090</fedora.port>
     <fedora.home>${project.build.directory}/fedora-home</fedora.home>
   </properties>
 
@@ -27,8 +28,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.1</version>
-      <scope>test</scope>
+      <version>2.4</version>
     </dependency>
     <dependency>
       <groupId>org.fcrepo</groupId>
@@ -52,7 +52,6 @@
       <version>${fcrepo.version}</version>
       <type>war</type>
       <scope>test</scope>
-
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -99,12 +98,11 @@
             </execution>
           </executions>
           <configuration>
-            <classpathScope>test</classpathScope>
             <executable>java</executable>
             <arguments>
               <argument>-classpath</argument>
               <classpath/>
-              <argument>com.yourmediashelf.sandbox.FedoraHome</argument>
+              <argument>com.yourmediashelf.fedora.cargo.FedoraHome</argument>
               <argument>${project.build.testOutputDirectory}/install.properties</argument>
             </arguments>
           </configuration>
@@ -176,6 +174,7 @@
         <artifactId>cargo-maven2-plugin</artifactId>
         <version>1.2.4</version>
         <configuration>
+          <wait>true</wait>
           <container>
             <containerId>tomcat7x</containerId>
             <zipUrlInstaller>
@@ -202,6 +201,7 @@
           <configuration>
             <properties>
               <cargo.servlet.uriencoding>UTF-8</cargo.servlet.uriencoding>
+              <cargo.servlet.port>${fedora.port}</cargo.servlet.port>
               <cargo.jvmargs>-XX:MaxPermSize=256M -Xmx512M</cargo.jvmargs>
             </properties>
           </configuration>
@@ -250,11 +250,9 @@
           <systemPropertyVariables>
             <test.debug>false</test.debug>
             <test.validate>false</test.validate>
-            <fedora.test.baseUrl>http://localhost:8080/fedora</fedora.test.baseUrl>
+            <fedora.test.baseUrl>http://localhost:${fedora.port}/fedora</fedora.test.baseUrl>
             <fedora.test.username>fedoraAdmin</fedora.test.username>
             <fedora.test.password>fedoraAdmin</fedora.test.password>
-            <javax.net.ssl.trustStore>${fedora.home}/server/truststore</javax.net.ssl.trustStore>
-            <javax.net.ssl.trustStorePassword>tomcat</javax.net.ssl.trustStorePassword>
             <org.apache.activemq.default.directory.prefix>${project.build.directory}/</org.apache.activemq.default.directory.prefix>
           </systemPropertyVariables>
         </configuration>

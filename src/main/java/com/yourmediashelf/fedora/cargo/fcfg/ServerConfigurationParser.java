@@ -1,12 +1,26 @@
-/* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also 
- * available online at http://fedora-commons.org/license/).
+/**
+ * Copyright (C) 2010 MediaShelf <http://www.yourmediashelf.com/>
+ *
+ * This file is part of fedora-client.
+ *
+ * fedora-client is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fedora-client is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with fedora-client.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.yourmediashelf.sandbox.fcfg;
+
+package com.yourmediashelf.fedora.cargo.fcfg;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +36,7 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  *
  */
-public class ServerConfigurationParser
-        extends DefaultHandler {
+public class ServerConfigurationParser extends DefaultHandler {
 
     private SAXParser m_parser;
 
@@ -85,9 +98,8 @@ public class ServerConfigurationParser
         try {
             m_parser.parse(m_xmlStream, this);
             return new ServerConfiguration(m_serverClassName,
-                                           m_serverParameters,
-                                           m_moduleConfigurations,
-                                           m_datastoreConfigurations);
+                    m_serverParameters, m_moduleConfigurations,
+                    m_datastoreConfigurations);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Error parsing XML: " + e.getMessage());
@@ -95,10 +107,8 @@ public class ServerConfigurationParser
     }
 
     @Override
-    public void startElement(String uri,
-                             String localName,
-                             String qName,
-                             Attributes a) throws SAXException {
+    public void startElement(String uri, String localName, String qName,
+            Attributes a) throws SAXException {
         if (localName.equals("server")) {
             m_serverClassName = a.getValue("class");
         } else if (localName.equals("module")) {
@@ -126,7 +136,7 @@ public class ServerConfigurationParser
                 if (name.length() > 5 && name.endsWith("value")) {
                     String value = a.getValue(i);
                     m_profileValues.put(name.substring(0, name.length() - 5),
-                                        value);
+                            value);
                 }
             }
         }
@@ -138,18 +148,15 @@ public class ServerConfigurationParser
         if (localName.equals("module")) {
             // add a new ModuleConfiguration to m_moduleConfigurations
             m_inModuleOrDatastore = false;
-            m_moduleConfigurations
-                    .add(new ModuleConfiguration(m_moduleOrDatastoreParameters,
-                                                 m_role,
-                                                 m_class,
-                                                 m_moduleOrDatastoreComment));
+            m_moduleConfigurations.add(new ModuleConfiguration(
+                    m_moduleOrDatastoreParameters, m_role, m_class,
+                    m_moduleOrDatastoreComment));
         } else if (localName.equals("datastore")) {
             // add a new DatastoreConfiguration to m_datastoreConfigurations
             m_inModuleOrDatastore = false;
-            m_datastoreConfigurations
-                    .add(new DatastoreConfiguration(m_moduleOrDatastoreParameters,
-                                                    m_id,
-                                                    m_moduleOrDatastoreComment));
+            m_datastoreConfigurations.add(new DatastoreConfiguration(
+                    m_moduleOrDatastoreParameters, m_id,
+                    m_moduleOrDatastoreComment));
         } else if (localName.equals("comment")) {
             // figure out what kind of thing this is a comment for
             // if we're in a param, it's for the param.
@@ -166,11 +173,8 @@ public class ServerConfigurationParser
         } else if (localName.equals("param")) {
             m_inParam = false;
             m_lastParam =
-                    new Parameter(m_paramName,
-                                  m_paramValue,
-                                  m_paramIsFilePath,
-                                  m_paramComment,
-                                  m_profileValues);
+                    new Parameter(m_paramName, m_paramValue, m_paramIsFilePath,
+                            m_paramComment, m_profileValues);
             if (m_inModuleOrDatastore) {
                 m_moduleOrDatastoreParameters.add(m_lastParam);
             } else {

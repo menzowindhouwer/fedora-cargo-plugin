@@ -1,4 +1,4 @@
-package com.yourmediashelf.sandbox;
+package com.yourmediashelf.fedora.cargo;
 /**
  * Copyright (C) 2010 MediaShelf <http://www.yourmediashelf.com/>
  *

@@ -1,14 +1,27 @@
-/* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also
- * available online at http://fedora-commons.org/license/).
+/**
+ * Copyright (C) 2010 MediaShelf <http://www.yourmediashelf.com/>
+ *
+ * This file is part of fedora-client.
+ *
+ * fedora-client is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fedora-client is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with fedora-client.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.yourmediashelf.sandbox;
+
+package com.yourmediashelf.fedora.cargo;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URL;
-
 import java.util.Properties;
 
 /**
@@ -58,19 +71,20 @@ public abstract class Distribution {
         // an up to date install.properties should be provided by the buildfile
         String path = "resources/install.properties";
         InputStream in =
-                OptionDefinition.class.getClassLoader()
-                        .getResourceAsStream(path);
+                OptionDefinition.class.getClassLoader().getResourceAsStream(
+                        path);
         PROPS = new Properties();
         try {
             PROPS.load(in);
         } catch (Exception e) {
-            System.err.println("ERROR: Unable to load required resource: "
-                    + path);
+            System.err.println("ERROR: Unable to load required resource: " +
+                    path);
             System.exit(1);
         }
         TOMCAT = PROPS.getProperty("install.tomcat");
         JDBC_DERBY = PROPS.getProperty("install.jdbc.derby");
-        JDBC_DERBY_NETWORK = PROPS.getProperty("install.jdbc.derbynetworkclient");
+        JDBC_DERBY_NETWORK =
+                PROPS.getProperty("install.jdbc.derbynetworkclient");
         JDBC_MYSQL = PROPS.getProperty("install.jdbc.mysql");
         JDBC_POSTGRESQL = PROPS.getProperty("install.jdbc.postgresql");
         TOMCAT_BASENAME = PROPS.getProperty("install.tomcat.basename");

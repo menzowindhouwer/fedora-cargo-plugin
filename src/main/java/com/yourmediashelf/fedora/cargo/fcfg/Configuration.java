@@ -1,8 +1,23 @@
-/* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also
- * available online at http://fedora-commons.org/license/).
+/**
+ * Copyright (C) 2010 MediaShelf <http://www.yourmediashelf.com/>
+ *
+ * This file is part of fedora-client.
+ *
+ * fedora-client is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fedora-client is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with fedora-client.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.yourmediashelf.sandbox.fcfg;
+
+package com.yourmediashelf.fedora.cargo.fcfg;
 
 import java.io.File;
 import java.util.Arrays;
@@ -84,7 +99,9 @@ public abstract class Configuration implements Constants {
      * @return The value, null if undefined.
      */
     public final String getParameter(String name, boolean asAbsolutePath) {
-        if (!m_parameters.containsKey(name)) return null;
+        if (!m_parameters.containsKey(name)) {
+            return null;
+        }
 
         String paramValue = m_parameters.get(name).getValue();
         if (asAbsolutePath && paramValue != null) {
@@ -132,7 +149,6 @@ public abstract class Configuration implements Constants {
     public Collection<Parameter> getParameters(Class<Parameter> type) {
         return m_parameters.values();
     }
-
 
     /**
      * Gets an Iterator over the names of parameters for this component.

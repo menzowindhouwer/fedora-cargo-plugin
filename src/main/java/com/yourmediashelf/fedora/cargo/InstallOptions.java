@@ -1,8 +1,23 @@
-/* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also
- * available online at http://fedora-commons.org/license/).
+/**
+ * Copyright (C) 2010 MediaShelf <http://www.yourmediashelf.com/>
+ *
+ * This file is part of fedora-client.
+ *
+ * fedora-client is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fedora-client is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with fedora-client.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.yourmediashelf.sandbox;
+
+package com.yourmediashelf.fedora.cargo;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,12 +34,13 @@ public class InstallOptions {
 
     public static final String FEDORA_SERVERHOST = "fedora.serverHost";
 
-    public static final String FEDORA_APP_SERVER_CONTEXT = "fedora.serverContext";
+    public static final String FEDORA_APP_SERVER_CONTEXT =
+            "fedora.serverContext";
 
     public static final String APIA_AUTH_REQUIRED = "apia.auth.required";
 
     public static final String UPSTREAM_AUTH_ENABLED = "upstream.auth.enabled";
-    
+
     public static final String SSL_AVAILABLE = "ssl.available";
 
     public static final String APIA_SSL_REQUIRED = "apia.ssl.required";

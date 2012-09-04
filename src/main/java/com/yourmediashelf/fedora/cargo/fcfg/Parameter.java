@@ -1,13 +1,27 @@
-/* The contents of this file are subject to the license and copyright terms
- * detailed in the license directory at the root of the source tree (also
- * available online at http://fedora-commons.org/license/).
+/**
+ * Copyright (C) 2010 MediaShelf <http://www.yourmediashelf.com/>
+ *
+ * This file is part of fedora-client.
+ *
+ * fedora-client is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * fedora-client is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with fedora-client.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.yourmediashelf.sandbox.fcfg;
+
+package com.yourmediashelf.fedora.cargo.fcfg;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  *
@@ -24,11 +38,8 @@ public class Parameter implements Constants {
 
     private final Map<String, String> m_profileValues;
 
-    public Parameter(String name,
-                     String value,
-                     boolean isFilePath,
-                     String comment,
-                     Map<String, String> profileValues) {
+    public Parameter(String name, String value, boolean isFilePath,
+            String comment, Map<String, String> profileValues) {
         m_name = name;
         m_value = value;
         m_isFilePath = isFilePath;
@@ -37,7 +48,7 @@ public class Parameter implements Constants {
     }
 
     public Parameter(String name) {
-        this(name, null, false, null, new HashMap<String,String>());
+        this(name, null, false, null, new HashMap<String, String>());
     }
 
     public String getName() {
