@@ -7,9 +7,11 @@
     <version>7</version>
   </parent>
   <groupId>com.yourmediashelf.fedora</groupId>
-  <artifactId>fedora-cargo</artifactId>
+  <artifactId>fedora-cargo-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
   <version>0.1-SNAPSHOT</version>
-  <name>fedora-cargo</name>
+  <name>fedora-cargo-plugin</name>
+  <url>http://mediashelf.github.com/${project.artifactId}</url>
 
   <prerequisites>
     <maven>3.0.0</maven>
@@ -24,39 +26,38 @@
   </properties>
 
   <dependencies>
+    <!-- Maven plugin development dependencies -->
     <dependency>
-      <groupId>com.yourmediashelf.fedora.client</groupId>
-      <artifactId>fedora-client-core</artifactId>
-      <version>0.6</version>
-      <scope>test</scope>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>3.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>1.13.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>1.13.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.cargo</groupId>
+      <artifactId>cargo-core-uberjar</artifactId>
+      <version>1.2.4</version>
+    </dependency>
+
+    <!-- FedoraHome dependencies -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-installer</artifactId>
-      <version>${fcrepo.version}</version>
-      <classifier>fedora-home</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-      <exclusions>
-        <!-- wildcard exclusions shouldn't work and produce a WARNING, but in fact, 
-          they work at least as of Maven 3.0.3. Also see http://jira.codehaus.org/browse/MNG-3832 -->
-        <exclusion>
-          <groupId>*</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-webapp-fedora</artifactId>
-      <version>${fcrepo.version}</version>
-      <type>war</type>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -65,15 +66,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-      <version>3.0.3</version>
+      <groupId>org.apache.maven.plugin-testing</groupId>
+      <artifactId>maven-plugin-testing-harness</artifactId>
+      <version>2.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -88,32 +83,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.5.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>1.2.1</version>
-          <executions>
-            <execution>
-              <phase>pre-integration-test</phase>
-              <goals>
-                <goal>exec</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <executable>java</executable>
-            <arguments>
-              <argument>-classpath</argument>
-              <classpath />
-              <argument>com.yourmediashelf.fedora.cargo.FedoraHome</argument>
-              <argument>${project.build.testOutputDirectory}/install.properties</argument>
-            </arguments>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
           <version>1.0.0</version>
@@ -123,11 +92,10 @@
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>[2.5,)</versionRange>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
                     <goals>
-                      <goal>copy-dependencies</goal>
-                      <goal>unpack</goal>
+                      <goal>enforce</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
@@ -146,120 +114,27 @@
         <artifactId>lifecycle-mapping</artifactId>
       </plugin>
       <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.fcrepo</groupId>
-                  <artifactId>fcrepo-installer</artifactId>
-                  <classifier>fedora-home</classifier>
-                  <type>zip</type>
-                  <overWrite>false</overWrite>
-                  <outputDirectory>${fedora.home}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
-        <version>1.2.4</version>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
         <configuration>
-          <container>
-            <containerId>tomcat7x</containerId>
-            <zipUrlInstaller>
-              <url>https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.29/bin/apache-tomcat-7.0.29.zip</url>
-            </zipUrlInstaller>
-            <log>${project.build.directory}/container.log</log>
-            <systemProperties>
-              <fedora.home>${fedora.home}</fedora.home>
-              <javax.net.ssl.trustStore>${javax.net.ssl.trustStore}</javax.net.ssl.trustStore>
-              <javax.net.ssl.trustStorePassword>${javax.net.ssl.trustStorePassword}</javax.net.ssl.trustStorePassword>
-            </systemProperties>
-          </container>
-          <deployables>
-            <deployable>
-              <artifactId>fcrepo-webapp-fedora</artifactId>
-              <groupId>org.fcrepo</groupId>
-              <type>war</type>
-              <properties>
-                <!-- put our test deployment in URL tree -->
-                <context>fedora</context>
-              </properties>
-            </deployable>
-          </deployables>
-          <configuration>
-            <properties>
-              <cargo.servlet.uriencoding>UTF-8</cargo.servlet.uriencoding>
-              <cargo.servlet.port>${fedora.port}</cargo.servlet.port>
-              <cargo.jvmargs>-XX:MaxPermSize=256M -Xmx512M</cargo.jvmargs>
-            </properties>
-          </configuration>
+          <debug>false</debug>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
-        <executions>
-          <!-- starting container prior to integration tests -->
-          <execution>
-            <id>start-container</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>start</goal>
-            </goals>
-          </execution>
-          <!-- stopping container after integration tests -->
-          <execution>
-            <id>stop-container</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>stop</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.12.3</version>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.1</version>
         <configuration>
-          <systemPropertyVariables>
-            <test.debug>false</test.debug>
-            <test.validate>false</test.validate>
-            <fedora.test.baseUrl>http://localhost:${fedora.port}/fedora</fedora.test.baseUrl>
-            <fedora.test.username>fedoraAdmin</fedora.test.username>
-            <fedora.test.password>fedoraAdmin</fedora.test.password>
-            <org.apache.activemq.default.directory.prefix>${project.build.directory}/</org.apache.activemq.default.directory.prefix>
-          </systemPropertyVariables>
+          <goalPrefix>fedora-cargo</goalPrefix>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.yourmediashelf.fedora</groupId>
+        <artifactId>fedora-cargo-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <install.properties>${project.build.testOutputDirectory}/install.properties</install.properties>
         </configuration>
       </plugin>
     </plugins>
