@@ -1,20 +1,14 @@
 
 package com.yourmediashelf.fedora.cargo;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -84,47 +78,6 @@ public class FedoraHomeMojo extends FedoraCommonMojo {
             fh.install();
         } catch (InstallationFailedException e) {
             throw new MojoExecutionException(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Unzips the InputStream to the given destination directory.
-     * 
-     * @param zipFile File to unzip
-     * @param destDir
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    public static void unzip(File zipFile, File destDir)
-            throws FileNotFoundException, IOException {
-        int BUFFER = 2048;
-        BufferedOutputStream dest = null;
-        ZipFile zip = new ZipFile(zipFile);
-        Enumeration<? extends ZipEntry> entries = zip.entries();
-        ZipEntry entry;
-        while (entries.hasMoreElements()) {
-            entry = entries.nextElement();
-            if (entry.isDirectory()) {
-                // Otherwise, empty directories do not get created
-                (new File(destDir, entry.getName())).mkdirs();
-            } else {
-                BufferedInputStream is =
-                        new BufferedInputStream(zip.getInputStream(entry));
-
-                File f = new File(destDir, entry.getName());
-                f.getParentFile().mkdirs();
-                int count;
-                byte data[] = new byte[BUFFER];
-                // write the files to the disk
-                FileOutputStream fos = new FileOutputStream(f);
-                dest = new BufferedOutputStream(fos, BUFFER);
-                while ((count = is.read(data, 0, BUFFER)) != -1) {
-                    dest.write(data, 0, count);
-                }
-                dest.flush();
-                dest.close();
-                is.close();
-            }
         }
     }
 

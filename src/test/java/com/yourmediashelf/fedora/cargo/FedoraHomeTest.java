@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-public class TestFedoraHome {
+public class FedoraHomeTest {
 
     @Test
     public void test() throws Exception {

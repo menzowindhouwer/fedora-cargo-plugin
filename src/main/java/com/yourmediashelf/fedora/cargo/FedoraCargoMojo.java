@@ -1,8 +1,9 @@
 
 package com.yourmediashelf.fedora.cargo;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,13 +13,13 @@ import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.codehaus.cargo.container.LocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
 import org.codehaus.cargo.container.configuration.LocalConfiguration;
+import org.codehaus.cargo.container.configuration.StandaloneLocalConfiguration;
 import org.codehaus.cargo.container.deployable.WAR;
-import org.codehaus.cargo.container.installer.Installer;
-import org.codehaus.cargo.container.installer.ZipURLInstaller;
 import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
+import org.sonatype.aether.resolution.ArtifactResult;
 
 /**
  * 
@@ -36,16 +37,12 @@ public abstract class FedoraCargoMojo extends FedoraCommonMojo {
             FedoraCargoMojo.class.getName() + "-Container";
 
     /**
-     * Version of Fedora (e.g. 3.6 or 3.6.1-SNAPSHOT)
-     * @parameter property="containerId" 
-     *            default-value="tomcat7x"
-     */
-    protected String containerId;
-
-    /**
-     * The {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>} of the artifact to resolve.
+     * The {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>} 
+     * of the war to resolve.
      *
-     * @parameter alias="fedora.war" property="fedora.war" default-value="org.fcrepo:fcrepo-webapp-fedora:war:${fcrepo.version}"
+     * @parameter alias="fedora.war" 
+     *            property="fedora.war" 
+     *            default-value="org.fcrepo:fcrepo-webapp-fedora:war:${fcrepo.version}"
      */
     private String fedoraWar;
 
@@ -58,11 +55,26 @@ public abstract class FedoraCargoMojo extends FedoraCommonMojo {
     private Map<String, String> systemProperties;
 
     /**
+     * container.id (e.g. tomcat7x)
+     * @parameter alias="container.id"
+     *            property="container.id" 
+     *            default-value="tomcat7x"
+     */
+    protected String containerId;
+
+    /**
      * Container log file location
      * @parameter property="container.log" 
      *            default-value="${project.build.directory}/container.log"
      */
     private String containerLog;
+
+    /**
+     * @parameter alias="container.artifact"
+     *            property="container.artifact" 
+     *            default-value="org.fcrepo:apache-tomcat:zip:7.0.29"
+     */
+    private String containerArtifact;
 
     public void execute() throws MojoExecutionException {
 
@@ -98,28 +110,40 @@ public abstract class FedoraCargoMojo extends FedoraCommonMojo {
         return configureContainer(home);
     }
 
-    private String installContainer() throws MojoExecutionException {
-        Installer installer;
+    protected String installContainer() throws MojoExecutionException {
+        File buildDir =
+                new File(mavenProject.getBuild().getDirectory(), "extracts");
+        ArtifactResult result = getArtifact(containerArtifact);
         try {
-            installer =
-                    new ZipURLInstaller(
-                            new URL(
-                                    "https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.29/bin/apache-tomcat-7.0.29.zip"),
-                            "target/downloads", "target/extracts");
-        } catch (MalformedURLException e) {
+            unzip(result.getArtifact().getFile(), buildDir);
+        } catch (FileNotFoundException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
-        installer.install();
-        getLog().info("Installed container to " + installer.getHome());
-        return installer.getHome();
+
+        // Some potentially unwarranted assumptions to determine the 
+        // install directory:
+        // if buildDir contains only one file, we assume that the child is the 
+        // home dir, otherwise we assume the archive did not contain a root dir 
+        // and we just return the buildDir
+        File[] subdirs = buildDir.listFiles();
+        if (subdirs != null && subdirs.length == 1) {
+            return subdirs[0].getAbsolutePath();
+        } else {
+            return buildDir.getAbsolutePath();
+        }
     }
 
     private InstalledLocalContainer configureContainer(String home)
             throws MojoExecutionException {
+        getLog().info("Using container home: " + home);
+
         ConfigurationFactory configurationFactory =
                 new DefaultConfigurationFactory();
-        LocalConfiguration configuration =
-                (LocalConfiguration) configurationFactory.createConfiguration(
+        StandaloneLocalConfiguration configuration =
+                (StandaloneLocalConfiguration) configurationFactory
+                        .createConfiguration(
                         containerId, ContainerType.INSTALLED,
                         ConfigurationType.STANDALONE);
         configuration.setProperty(ServletPropertySet.PORT, fedoraPort);
@@ -129,17 +153,15 @@ public abstract class FedoraCargoMojo extends FedoraCommonMojo {
                 (InstalledLocalContainer) cf.createContainer(containerId,
                         ContainerType.INSTALLED, configuration);
         c.setHome(home);
-
-        deploy(c.getConfiguration());
-
         c.setOutput(containerLog);
         c.setSystemProperties(getSystemProperties());
 
+        deploy(c.getConfiguration());
         return c;
     }
 
     //FIXME: this currently deploys fedoraWar unless the current artifact
-    // is itself a war. Should be flexible enough to support one or many wars.
+    // is itself a war. We really should be more flexible here.
     private void deploy(LocalConfiguration cfg) throws MojoExecutionException {
         WAR war = null;
         if (mavenProject.getPackaging().equalsIgnoreCase("war")) {
