@@ -21,6 +21,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <!-- Use ${project_name} instead of ${project.artifactId} to avoid incorrect 
+      replacements of "fedora-cargo-plugin" in child modules -->
+    <project_name>fedora-cargo-plugin</project_name>
   </properties>
 
   <dependencies>
