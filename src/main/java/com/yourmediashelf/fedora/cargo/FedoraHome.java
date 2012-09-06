@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -475,6 +476,21 @@ public class FedoraHome {
         }
     }
 
+    public static Map<String, String> loadMap(File f) throws IOException {
+        return loadMap(new FileInputStream(f));
+    }
+
+    public static Map<String, String> loadMap(InputStream in)
+            throws IOException {
+        Properties props = new Properties();
+        try {
+            props.load(in);
+        } finally {
+            in.close();
+        }
+        return loadMap(props);
+    }
+
     /**
      * Loads a Map from the given Properties file.
      *
@@ -485,24 +501,15 @@ public class FedoraHome {
      * @see java.util.Properties
      * @see java.util.Map
      */
-    public static Map<String, String> loadMap(File f) throws IOException {
-        Properties props = new Properties();
-        FileInputStream in = new FileInputStream(f);
-        try {
-            props.load(in);
-            Map<String, String> map = new HashMap<String, String>();
-            Set<Entry<Object, Object>> entrySet = props.entrySet();
-            for (Entry<Object, Object> entry : entrySet) {
-                // The casts to String should always succeed
-                map.put((String) entry.getKey(), (String) entry.getValue());
-            }
-            return map;
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-            }
+    public static Map<String, String> loadMap(Properties props)
+            throws IOException {
+        Map<String, String> map = new HashMap<String, String>();
+        Set<Entry<Object, Object>> entrySet = props.entrySet();
+        for (Entry<Object, Object> entry : entrySet) {
+            // The casts to String should always succeed
+            map.put((String) entry.getKey(), (String) entry.getValue());
         }
+        return map;
     }
 
     /**

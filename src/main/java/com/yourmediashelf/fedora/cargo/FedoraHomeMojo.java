@@ -7,14 +7,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.resolution.ArtifactResult;
 
 /**
@@ -28,8 +33,7 @@ public class FedoraHomeMojo extends FedoraCommonMojo {
     /**
      * Location of install.properties File
      * @parameter alias="install.properties" 
-     *            property="install.properties" 
-     *            default-value="${project.build.testOutputDirectory}/install.properties"
+     *            property="install.properties"
      */
     private File installProperties;
 
@@ -41,12 +45,10 @@ public class FedoraHomeMojo extends FedoraCommonMojo {
     private String fedoraHomeZip;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-
-        getLog().info(installProperties.toString());
         getLog().info(fcrepoVersion.toString());
 
         ArtifactResult result = getArtifact(fedoraHomeZip);
-        
+
         try {
             unzip(result.getArtifact().getFile(), fedoraHomeDir);
         } catch (FileNotFoundException e) {
@@ -56,18 +58,22 @@ public class FedoraHomeMojo extends FedoraCommonMojo {
         }
 
         applyFedoraHomeInstallProperties();
-
     }
 
+    /**
+     * Applies install.properties to FEDORA_HOME, performing property
+     * substitutions for ${fedora.home} and the like.
+     * 
+     * If the install.properties parameter is not set, applies a set of
+     * default properties.
+     * 
+     * @throws MojoExecutionException
+     */
     private void applyFedoraHomeInstallProperties()
             throws MojoExecutionException {
         InstallOptions opts;
-        Map<String, String> props = new HashMap<String, String>();
-        try {
-            props.putAll(FedoraHome.loadMap(installProperties));
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
-        }
+        Map<String, String> props = getInstallProperties();
+
         try {
             opts = new InstallOptions(props);
         } catch (OptionValidationException e) {
@@ -122,4 +128,107 @@ public class FedoraHomeMojo extends FedoraCommonMojo {
         }
     }
 
+    private Map<String, String> getInstallProperties()
+            throws MojoExecutionException {
+        Map<String, String> filteredProps = new HashMap<String, String>();
+        if (installProperties == null) {
+            getLog().info("install.properties not set, using default");
+            InputStream is =
+                    this.getClass().getClassLoader().getResourceAsStream(
+                            "default_install.properties");
+            try {
+                // Use the Maven project properties as the lookup table for 
+                // property substition values
+                Properties mavenProps = mavenProject.getProperties();
+                Properties p = applyFilters(is, mavenProps);
+                filteredProps.putAll(FedoraHome.loadMap(p));
+            } catch (IOException e) {
+                throw new MojoExecutionException(e.getMessage(), e);
+            }
+        } else {
+            try {
+                filteredProps.putAll(FedoraHome.loadMap(installProperties));
+            } catch (IOException e) {
+                throw new MojoExecutionException(e.getMessage(), e);
+            }
+        }
+        return filteredProps;
+    }
+
+    /**
+     * Applies values defined in lookup to source.
+     * 
+     * @param source
+     * @param lookup
+     * @return
+     * @throws IOException
+     */
+    public static Properties applyFilters(InputStream source,
+            Properties lookup) throws IOException {
+
+        final Properties sourceProps = new Properties();
+        try {
+            sourceProps.load(source);
+        } finally {
+            IOUtil.close(source);
+        }
+
+        final Properties filterdProps = new Properties();
+        filterdProps.putAll(sourceProps);
+
+        for (Iterator<?> iter = sourceProps.keySet().iterator(); iter.hasNext();) {
+            final String k = (String) iter.next();
+            final String propValue =
+                    getPropertyValue(k, filterdProps, lookup);
+            sourceProps.setProperty(k, propValue);
+        }
+        return sourceProps;
+    }
+
+    /**
+     * A less complete, modified version of PropertyUtils.getPropertyValue
+     * 
+     * @param k
+     * @param p
+     * @param lookup
+     * @return
+     */
+    private static String getPropertyValue(String k, Properties p,
+            Properties lookup) {
+        String v = p.getProperty(k);
+        String ret = "";
+        int idx, idx2;
+
+        while ((idx = v.indexOf("${")) >= 0) {
+            // append prefix to result
+            ret += v.substring(0, idx);
+
+            // strip prefix from original
+            v = v.substring(idx + 2);
+
+            // if no matching } then bail
+            if ((idx2 = v.indexOf('}')) < 0) {
+                break;
+            }
+
+            // strip out the key and resolve it
+            // resolve the key/value for the ${statement}
+            String nk = v.substring(0, idx2);
+            v = v.substring(idx2 + 1);
+            String nv = lookup.getProperty(nk);
+
+            // try global environment..
+            if (nv == null && !StringUtils.isEmpty(nk)) {
+                nv = System.getProperty(nk);
+            }
+
+            // if the key cannot be resolved, leave it as is
+            if (nv == null || nv.equals(k)) {
+                ret += "${" + nk + "}";
+            } else {
+                v = nv + v;
+            }
+        }
+        return ret + v;
+    }
 }

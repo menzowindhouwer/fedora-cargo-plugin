@@ -43,11 +43,6 @@ public abstract class FedoraCargoMojo extends FedoraCommonMojo {
     protected String containerId;
 
     /**
-     * @parameter alias="fedora.port" property="fedora.port" default-value="8080"
-     */
-    protected String fedoraPort;
-
-    /**
      * The {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>} of the artifact to resolve.
      *
      * @parameter alias="fedora.war" property="fedora.war" default-value="org.fcrepo:fcrepo-webapp-fedora:war:${fcrepo.version}"

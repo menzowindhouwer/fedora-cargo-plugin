@@ -42,6 +42,11 @@ public abstract class FedoraCommonMojo extends AbstractMojo {
     protected File fedoraHomeDir;
 
     /**
+     * @parameter alias="fedora.port" property="fedora.port" default-value="8080"
+     */
+    protected String fedoraPort;
+
+    /**
     * The entry point to Aether, i.e. the component doing all the work.
     *
     * @component

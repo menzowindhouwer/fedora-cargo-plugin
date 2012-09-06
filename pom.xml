@@ -38,6 +38,11 @@
       <version>3.0</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-filtering</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
       <version>1.13.1</version>
@@ -59,27 +64,16 @@
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
     </dependency>
+
+    <!-- testing dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.10</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.plugin-testing</groupId>
-      <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>2.0</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
-    <!-- copies and filters install.properties -->
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -117,7 +111,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.5.1</version>
         <configuration>
-          <debug>false</debug>
+          <debug>true</debug>
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
@@ -129,15 +123,6 @@
           <goalPrefix>fedora-cargo</goalPrefix>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>com.yourmediashelf.fedora</groupId>
-        <artifactId>fedora-cargo-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <install.properties>${project.build.testOutputDirectory}/install.properties</install.properties>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
-
 </project>
