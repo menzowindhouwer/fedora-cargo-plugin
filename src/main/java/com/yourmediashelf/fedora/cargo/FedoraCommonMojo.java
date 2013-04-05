@@ -52,10 +52,10 @@ public abstract class FedoraCommonMojo extends AbstractMojo {
     protected MavenProject mavenProject;
 
     /**
-     * Version of Fedora (e.g. 3.6 or 3.6.1-SNAPSHOT)
+     * Version of Fedora (e.g. 3.6.2 or 3.7-SNAPSHOT)
      * @parameter alias="fcrepo.version" 
      *            property="fcrepo.version" 
-     *            default-value="3.6.1-SNAPSHOT"
+     *            default-value="3.6.2"
      */
     protected String fcrepoVersion;
 
