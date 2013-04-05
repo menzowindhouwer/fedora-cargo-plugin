@@ -181,7 +181,7 @@ public abstract class FedoraCommonMojo extends AbstractMojo {
     private RemoteRepository getThirdPartyRepo() {
         if (thirdParty == null) {
             thirdParty =
-                new RemoteRepository("duraspace-thirdparty", null,
+                    new RemoteRepository("duraspace-thirdparty", "default",
                         "https://m2.duraspace.org/content/repositories/thirdparty");
         }
         return thirdParty;

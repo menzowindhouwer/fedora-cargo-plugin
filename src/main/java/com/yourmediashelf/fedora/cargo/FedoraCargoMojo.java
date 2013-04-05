@@ -90,7 +90,7 @@ public abstract class FedoraCargoMojo extends FedoraCommonMojo {
     /**
      * @parameter alias="container.artifact"
      *            property="container.artifact" 
-     *            default-value="org.fcrepo:apache-tomcat:zip:7.0.39"
+     *            default-value="org.apache.tomcat:tomcat:zip:7.0.39"
      */
     private String containerArtifact;
 
