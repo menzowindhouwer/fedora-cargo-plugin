@@ -131,7 +131,7 @@ public class FedoraHomeMojo extends FedoraCommonMojo {
      * 
      * @param source
      * @param lookup
-     * @return
+     * @return Properties
      * @throws IOException
      */
     public static Properties applyFilters(InputStream source,
@@ -162,7 +162,7 @@ public class FedoraHomeMojo extends FedoraCommonMojo {
      * @param k
      * @param p
      * @param lookup
-     * @return
+     * @return the property value
      */
     private static String getPropertyValue(String k, Properties p,
             Properties lookup) {

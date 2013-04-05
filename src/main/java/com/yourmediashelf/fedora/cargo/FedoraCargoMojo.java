@@ -198,7 +198,8 @@ public abstract class FedoraCargoMojo extends FedoraCommonMojo {
 
     /**
      * Ensures that fedora.home is set as a system prop (if it was defined)
-     * @return
+     * @return a Map of properties that includes the key "fedora.home" if it
+     * was defined.
      */
     private Map<String, String> getSystemProperties() {
         if (systemProperties == null) {

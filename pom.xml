@@ -112,6 +112,32 @@
         </configuration>
       </plugin>
       <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <!-- This configuration is to suppress such javadoc warnings as
+        "@parameter is an unknown tag" -->
+        <configuration>
+          <tags>
+            <tag>
+              <name>goal</name>
+              <placement>X</placement>
+            </tag>
+            <tag>
+              <name>parameter</name>
+              <placement>X</placement>
+            </tag>
+            <tag>
+              <name>phase</name>
+              <placement>X</placement>
+            </tag>
+            <tag>
+              <name>requiresProject</name>
+              <placement>X</placement>
+            </tag>
+          </tags>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
         <version>3.1</version>
         <configuration>

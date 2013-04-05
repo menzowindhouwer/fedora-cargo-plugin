@@ -175,7 +175,8 @@ public abstract class FedoraCommonMojo extends AbstractMojo {
      * 7.0.35 (11 January 2013). This allows us to add a repo for previous
      * versions of Tomcat 6x and 7x).
      * 
-     * @return
+     * @return A RemoteRepository configured with the duraspace-thirdparty 
+     * Maven repository (https://m2.duraspace.org/content/repositories/thirdparty).
      */
     private RemoteRepository getThirdPartyRepo() {
         if (thirdParty == null) {

@@ -493,7 +493,7 @@ public class FedoraHome {
     /**
      * Loads a Map from the given Properties file.
      *
-     * @param f
+     * @param props
      *        the Properties file to parse.
      * @return a Map<String, String> representing the given Properties file.
      * @throws IOException
