@@ -171,8 +171,9 @@ public abstract class FedoraCommonMojo extends AbstractMojo {
     }
 
     /**
-     * Tomcat (as a zip) isn't available in Maven Central, so we add this repo
-     * which has at least a current version of Tomcat 6x and 7x)
+     * Tomcat (as a zip) only became available in Maven Central as of version 
+     * 7.0.35 (11 January 2013). This allows us to add a repo for previous
+     * versions of Tomcat 6x and 7x).
      * 
      * @return
      */
