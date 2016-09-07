@@ -37,7 +37,7 @@ import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
-import org.sonatype.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
  * 

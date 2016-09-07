@@ -32,7 +32,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
  * 
